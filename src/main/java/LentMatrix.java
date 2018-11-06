@@ -198,6 +198,7 @@ public class LentMatrix {
         exactX = new double[N+1];
         A=new double[N+1][2*L];
         BС= new double[N+1][2*L];
+        f = new double[N+1];
 
     }
 

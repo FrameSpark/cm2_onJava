@@ -13,7 +13,7 @@ public class Cholesky {
     void relativeError() {
         double max;
         double q = 0.001;
-        if (Math.abs(lent.exactX[0]) < q)
+        if (Math.abs(lent.exactX[0]) > q)
             max = Math.abs((lent.x[0] - lent.exactX[0]) / lent.exactX[0]);
         else
             max = Math.abs(lent.x[0] - lent.exactX[0]);
@@ -29,22 +29,52 @@ public class Cholesky {
         }
         relativeErr = max;
     }
-
+    //функция решения,заполнения матриц,вычисление погрешности
     void solve(int left, int right) {
         do {
             lent.resetData();
             lent.fillA(left, right);
             lent.fillExactX(left, right);
             lent.mulByExact();
-             while(!(solveBC(0.0001) && solveY(0.0001) && solveX())){
+
+            while (!(solveBC(0.0001) && solveY(0.0001) && solveX()))
+            {
+
                  lent.resetData();
                  lent.fillA(left,right);
                  lent.fillExactX(left,right);
                  lent.mulByExact();
+
              }
+
+
              relativeError();
-        }while (relativeErr != 0);
+        }while (relativeErr == 0);
         return;
+    }
+
+    //решение для плохо обусловленной матрицы
+    void solveBadMatrix(int left,int right,int k){
+        double q=0.00001;
+        if(k==6)
+            q=0;
+        do{
+            lent.resetData();
+            lent.fillBadMatrix(left,right,k);
+            lent.fillExactX(left,right);
+            lent.mulByExact();
+            while (!(solveBC(q) && solveY(q) && solveX()))
+            {
+                // задаем новую матрицу, если решение было нудачным
+                lent.resetData(); // удаляем данные предыдущей матрицы
+                lent.fillBadMatrix(left, right, k);
+                lent.fillExactX(left, right);
+                lent.mulByExact();
+            }
+            relativeError();
+        } while (relativeErr == 0); //если = 0, то пересчитываем снова
+        return;
+
     }
 
     //Вычисление BC
